@@ -1,14 +1,16 @@
 from urllib.parse import urlencode
 from datetime import date, datetime
+from pytz import timezone
 import requests
-import os
+import os   
 from dotenv import load_dotenv
 load_dotenv()
 
-##Pegando data atual
-dataAtual = "2022-02-22"#date.today()
-now = datetime.now()
-dataPrint = now.strftime('%d/%m/%Y - %H:%M:%S')
+data_e_hora_atuais = datetime.now()
+fuso_horario = timezone('America/Sao_Paulo')
+data_e_hora_sao_paulo = data_e_hora_atuais.astimezone(fuso_horario)
+dataPrint = data_e_hora_sao_paulo.strftime('%d/%m/%Y - %H:%M:%S')
+dataAtual = data_e_hora_sao_paulo.strftime('%d/%m/%Y')
 
 
 ##Configuracoes Discord
@@ -62,10 +64,11 @@ for result in objcomments['results']:
         if index == 0:
             resultado = str(result['author_id']) ##resultado em inteiro convertido para string
             break
-    if(resultado != os.getenv("AUTHOR1") and resultado != os.getenv("AUTHOR2")):
+    if(resultado != os.getenv("AUTHOR1") and resultado != os.getenv("AUTHOR2") and resultado != os.getenv("AUTHOR3") ):
         print('Ticket:',comment,'| Cliente:',nameOrganization, '| URL',urlTicket)
         
         payload = { 
             'content': "Ticket: {0} | Cliente: {1} | URL: {2}".format(comment,nameOrganization,urlTicket)
         }   
         requests.post('https://discord.com/api/v9/channels/{0}/messages'.format(idChannel), data=payload, headers=header)
+
